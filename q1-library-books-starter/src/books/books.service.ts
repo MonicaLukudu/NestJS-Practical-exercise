@@ -4,6 +4,7 @@ import { SEED_BOOKS } from './books.seed';
 import { CreateBookDto } from './dto/create-book.dto';
 import { QueryBooksDto } from './dto/query-books.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { type PartialTypeType  } from '@nestjs/mapped-types';
 
 @Injectable()
 export class BooksService {
@@ -19,17 +20,38 @@ export class BooksService {
 
   // TODO (Task 4): return the book or throw a 404 "Book with id <id> not found".
   findOne(id: number): Book {
-    throw new NotImplementedException();
+    const book = this.books.find((b) => b.id === id);
+    if(!book){
+      throw new Error(`Book with ${id} not found`);
+    }
+    return book;
   }
 
   // TODO (Task 2): create the book (apply defaults, reject duplicate ISBNs with 409).
   create(dto: CreateBookDto): Book {
-    throw new NotImplementedException();
+    if(this.books.some((b) => b.isbn === dto.isbn)){
+      throw new Error(`Book with ISBN ${dto.isbn} already exists`);
+    }
+    return {
+      'author': dto.author,
+      'available': dto.available ?? true,
+      'genres': dto.genres ?? [],
+      'id': this.nextId++,
+      'isbn': dto.isbn,
+      'publishedYear': dto.publishedYear,
+      'title': dto.title
+    }
   }
 
   // TODO (Task 5): partially update a book.
-  update(id: number, dto: UpdateBookDto): Book {
-    throw new NotImplementedException();
+  update(id: number, dto: UpdateBookDto): Book | PartialTypeType {
+    const book = this.books.find((b) => b.id === id);
+    if(!book){
+      throw new Error(`Book with ${id} not found`);
+    }
+    if(dto.isbn && this.books.some((b) => b.isbn === dto.isbn && b.id !== id)){
+      throw new Error(`Book with ISBN ${dto.isbn} already exists`);
+    }
   }
 
   // TODO (Task 6): delete a book.

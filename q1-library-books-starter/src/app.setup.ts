@@ -7,4 +7,5 @@ import { INestApplication } from '@nestjs/common';
  */
 export function configureApp(app: INestApplication): void {
   // TODO (Task 1): register a global ValidationPipe with the options described in README.md
+  app.useGlobalPipes()
 }
